@@ -2,6 +2,9 @@
 
 A beginner-friendly, secure web application that allows doctors to search for past patient cases with similar symptoms using Retrieval-Augmented Generation (RAG) while protecting patient data through local storage and JWT authentication.
 
+### The working version of this Streamlit application is deployed on Streamlit Cloud and can be viewed online through : https://gurkirt-bot-medi-secure-rag-frontendmain-yklv75.streamlit.app/
+
+
 ## Project Overview
 
 This project demonstrates a complete RAG (Retrieval-Augmented Generation) system specifically designed for healthcare professionals. It enables doctors to:
@@ -128,7 +131,6 @@ Separating authentication, RAG logic, data loading, and UI into different module
 **6. Simple tools are often the best choice for production-ready demos**
 
 Using Streamlit, FAISS, and sentence-transformers taught me that you don’t need heavy frameworks to build something useful. These tools allowed me to focus on functionality instead of boilerplate. I learned how to balance simplicity with real-world requirements, which is especially important when building internal tools or proof-of-concepts.
-
 
 
 This project helped me understand how AI systems must be designed differently in regulated domains like healthcare, where correctness, privacy, and explainability matter more than raw model capability.
