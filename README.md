@@ -105,28 +105,30 @@ Security is critical in medical applications. python-dotenv allows us to store s
 All these technologies were chosen to work seamlessly while keeping the system simple and secure. Streamlit handles the user interface, FAISS manages the complex search operations, and the embedding model ensures accurate medical understanding. The stack avoids complex cloud dependencies while still providing powerful AI capabilities. Most importantly, every component can run on a standard computer without specialized hardware, making it accessible to small medical practices.
 
 ## What I Learned During This Project
-1. Building RAG systems is mostly about data quality, not the LLM
+**1. I gained a practical understanding of how RAG works end-to-end**
+
+This project helped me understand Retrieval-Augmented Generation beyond theory. I learned how a user query is first converted into an embedding, matched against stored document embeddings in a vector database, and how only the most relevant medical cases are passed to the language model as context. Seeing how the LLM’s output changes based on retrieved context made it clear why retrieval quality directly affects response accuracy, especially in domains like healthcare where hallucinations are risky.
+
+**2. Building RAG systems is mostly about data quality, not the LLM**
 
 Before this project, I assumed the language model would be the most important part. In practice, I learned that cleaning, chunking, and embedding the medical notes correctly had a much bigger impact on answer quality. Small choices like chunk size and overlap significantly changed help­fulness of results, especially with long medical transcriptions.
 
-2. Security decisions affect architecture from day one
+**3. Security decisions affect architecture from day one**
 
 Implementing JWT authentication early made me think differently about the entire application flow. I learned that security is not something you “add later” — even a simple demo needs protected routes, session handling, and token validation. This project helped me understand how authentication shapes UI, backend logic, and user experience.
 
-3. Local-first design is critical for healthcare applications
+**4. Local-first design is critical for healthcare applications**
 
 Working with medical data made it very clear why local storage and zero data exfiltration are essential. I learned how to design a system where embeddings, vector stores, and raw data all remain on the same machine, while still enabling semantic search and AI responses. This was my first hands-on experience designing with real privacy constraints.
 
-4. Modular code makes experimentation much easier
+**5. Modular code makes experimentation much easier**
 
 Separating authentication, RAG logic, data loading, and UI into different modules saved a lot of time. When I needed to tweak embeddings or rebuild the FAISS index, I didn’t have to touch the UI or auth logic. This project showed me how clean separation of concerns directly improves development speed and maintainability.
 
-5. Simple tools are often the best choice for production-ready demos
+**6. Simple tools are often the best choice for production-ready demos**
 
 Using Streamlit, FAISS, and sentence-transformers taught me that you don’t need heavy frameworks to build something useful. These tools allowed me to focus on functionality instead of boilerplate. I learned how to balance simplicity with real-world requirements, which is especially important when building internal tools or proof-of-concepts.
 
-6. I gained a practical understanding of how RAG works end-to-end
 
-This project helped me understand Retrieval-Augmented Generation beyond theory. I learned how a user query is first converted into an embedding, matched against stored document embeddings in a vector database, and how only the most relevant medical cases are passed to the language model as context. Seeing how the LLM’s output changes based on retrieved context made it clear why retrieval quality directly affects response accuracy, especially in domains like healthcare where hallucinations are risky.
 
 This project helped me understand how AI systems must be designed differently in regulated domains like healthcare, where correctness, privacy, and explainability matter more than raw model capability.
