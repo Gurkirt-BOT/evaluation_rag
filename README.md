@@ -1,7 +1,6 @@
 # Medi-Secure: The Private Hospital Assistant
 
 A secure, context-aware RAG application for medical professionals to search patient history and receive AI-generated insights.
-**[View Demo on Streamlit Cloud](https://gurkirt-bot-medi-secure-rag-frontendmain-yklv75.streamlit.app/)**
 
 ---
 
