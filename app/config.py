@@ -28,7 +28,7 @@ class Config:
     CHUNK_OVERLAP = 50  # Characters overlap between chunks
     
     # RAG Configuration
-    EMBEDDING_MODEL = "sentence-transformers/all-MiniLM-L6-v2"
+    EMBEDDING_MODEL = "dmis-lab/biobert-base-cased-v1.1"
     TOP_K_RETRIEVAL = 3  # Number of similar documents to retrieve
     
     # UI Configuration

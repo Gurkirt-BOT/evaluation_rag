@@ -6,3 +6,7 @@ faiss-cpu
 groq
 python-dotenv
 PyJWT
+spacy
+transformers
+torch
+plotly

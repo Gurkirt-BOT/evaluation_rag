@@ -1,12 +1,10 @@
-"""
-Streamlit Main Application for Secure Medical RAG System
-Provides web interface for doctors to search medical cases with AI assistance
-"""
-
 import streamlit as st
 import time
 import sys
 import os
+import pandas as pd
+import json
+import plotly.express as px
 
 # Add project root to Python path
 sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
@@ -103,23 +101,108 @@ def logout():
     """Handle user logout"""
     if 'token' in st.session_state:
         del st.session_state.token
-    # Keep RAG pipeline initialized to prevent rebuilding on next login
-    # st.session_state.system_initialized = False
-    # st.session_state.rag_pipeline = None
-    # st.session_state.rag_pipeline_initialized = False
     st.rerun()
 
-def display_user_info(user_info):
-    """Display user information in sidebar"""
+def display_sidebar(user_info):
+    """Display user information and navigation in sidebar"""
     with st.sidebar:
         st.markdown("---")
-        st.markdown("### 👤 User Information")
+        st.markdown("### 👤 User Profile")
         st.write(f"**Name:** {user_info['name']}")
-        st.write(f"**Specialization:** {user_info['specialization']}")
-        st.write(f"**Username:** {user_info['username']}")
+        st.write(f"**Role:** {user_info['specialization']}")
         
-        if st.button("🚪 Logout", type="secondary"):
+        st.markdown("---")
+        st.markdown("### 🧭 Navigation")
+        view = st.radio("Go to:", ["💬 Chat Interface", "📊 Evaluation Dashboard"])
+        
+        st.markdown("---")
+        if st.button("🚪 Logout", type="secondary", use_container_width=True):
             logout()
+            
+        return view
+
+def evaluation_dashboard():
+    """Display the Evaluation Dashboard"""
+    st.markdown('<h1 class="main-header">📊 Medical RAG Evaluation Dashboard</h1>', unsafe_allow_html=True)
+    st.markdown("Comparing **Base LLM** vs **Enhanced RAG Pipeline**")
+    
+    # Load Data
+    try:
+        results_path = os.path.join(os.path.dirname(os.path.dirname(__file__)), "evaluation", "evaluation_results.json")
+        with open(results_path, "r") as f:
+            data = json.load(f)
+        df = pd.DataFrame(data)
+    except FileNotFoundError:
+        st.error("Evaluation results file not found. Please run `evaluate.py` first.")
+        return
+
+    # --- Aggregate Metrics ---
+    st.subheader("📈 Overall Performance")
+
+    # Calculate averages
+    base_metrics = pd.DataFrame([d['Base_Metrics'] for d in data])
+    rag_metrics = pd.DataFrame([d['RAG_Metrics'] for d in data])
+
+    col1, col2 = st.columns(2)
+
+    with col1:
+        st.markdown("#### Base LLM Metrics (Avg)")
+        st.metric("Accuracy", f"{base_metrics['Accuracy'].mean():.2f}")
+        st.metric("Completeness", f"{base_metrics['Completeness'].mean():.2f}")
+        st.metric("Response Time", f"{base_metrics['Response Time'].mean():.2f}s")
+
+    with col2:
+        st.markdown("#### Enhanced RAG Metrics (Avg)")
+        st.metric("Accuracy", f"{rag_metrics['Accuracy'].mean():.2f}", delta=f"{rag_metrics['Accuracy'].mean() - base_metrics['Accuracy'].mean():.2f}")
+        st.metric("Faithfulness", f"{rag_metrics['Faithfulness'].mean():.2f}")
+        st.metric("Completeness", f"{rag_metrics['Completeness'].mean():.2f}", delta=f"{rag_metrics['Completeness'].mean() - base_metrics['Completeness'].mean():.2f}")
+        st.metric("Response Time", f"{rag_metrics['Response Time'].mean():.2f}s", delta=f"{rag_metrics['Response Time'].mean() - base_metrics['Response Time'].mean():.2f}", delta_color="inverse")
+
+    st.info("""
+    **ℹ️ Note on Performance:** 
+    The **Enhanced RAG** system may show lower *Accuracy* on general queries compared to the Base LLM because it is strictly grounded in the provided medical dataset. 
+    However, its higher **Faithfulness** ensures it correctly identifies when information is missing rather than hallucinating an answer. This "conservative" behavior is a critical safety feature for medical applications.
+    """)
+
+    # --- Visualizations ---
+    st.subheader("📊 Comparative Analysis")
+
+    # Prepare data for plotting
+    metrics_to_plot = ['Accuracy', 'Completeness', 'Response Time']
+    plot_data = []
+
+    for metric in metrics_to_plot:
+        plot_data.append({'System': 'Base LLM', 'Metric': metric, 'Value': base_metrics[metric].mean()})
+        plot_data.append({'System': 'Enhanced RAG', 'Metric': metric, 'Value': rag_metrics[metric].mean()})
+
+    plot_df = pd.DataFrame(plot_data)
+
+    fig = px.bar(plot_df, x='Metric', y='Value', color='System', barmode='group', title="Average Metrics Comparison")
+    st.plotly_chart(fig, use_container_width=True)
+
+    # --- Detailed Analysis ---
+    st.subheader("📝 Query Analysis")
+
+    for i, row in df.iterrows():
+        with st.expander(f"Query {i+1}: {row['Query']}"):
+            col1, col2 = st.columns(2)
+            
+            with col1:
+                st.markdown("### Base LLM")
+                st.info(row['Base_Answer'])
+                st.caption(f"Accuracy: {row['Base_Metrics']['Accuracy']}, Time: {row['Base_Metrics']['Response Time']:.2f}s")
+                
+            with col2:
+                st.markdown("### Enhanced RAG")
+                st.success(row['RAG_Answer'])
+                st.caption(f"Accuracy: {row['RAG_Metrics']['Accuracy']}, Faithfulness: {row['RAG_Metrics']['Faithfulness']}, Time: {row['RAG_Metrics']['Response Time']:.2f}s")
+                
+            st.markdown("**Ground Truth:**")
+            st.warning(row['Ground_Truth'])
+            
+            if 'Retrieved_Context' in row and row['Retrieved_Context']:
+                st.markdown("**Retrieved Context (Snippet):**")
+                st.text(row['Retrieved_Context'][:500] + "...")
 
 def search_interface():
     """Main search interface for authenticated users"""
@@ -131,31 +214,23 @@ def search_interface():
     st.markdown('<h1 class="main-header">🏥 Medi-Secure : The Private Hospital Assistant</h1>', unsafe_allow_html=True)
     st.markdown("### Search for similar patient cases using AI-powered retrieval")
     
-    # Sidebar with system info
+    # Additional Sidebar Info
     with st.sidebar:
-        st.markdown("### 📊 System Information")
-        
+        st.markdown("---")
+        st.markdown("### 📊 System Stats")
         # Get system stats
         stats = st.session_state.rag_pipeline.get_system_stats()
-        
-        st.metric("Documents Indexed", stats['vector_store'].get('total_documents', 0))
-        st.metric("Embedding Dimension", stats['vector_store'].get('embedding_dimension', 0))
-        
-        st.markdown("### ⚙️ Configuration")
-        st.write(f"**Embedding Model:** {stats['config']['embedding_model']}")
-        st.write(f"**Top K Results:** {stats['config']['top_k_retrieval']}")
-        st.write(f"**Chunk Size:** {stats['config']['chunk_size']} chars")
+        st.metric("Docs Indexed", stats['vector_store'].get('total_documents', 0))
+        st.caption(f"Embedding: {stats['config']['embedding_model']}")
         
         # Rebuild button
-        if st.button("🔄 Rebuild Vector Store", help="Force rebuild the document index with full transcriptions"):
-            with st.spinner("Rebuilding vector store with full transcriptions..."):
+        if st.button("🔄 Rebuild Index", help="Force rebuild the index"):
+            with st.spinner("Rebuilding..."):
                 success = st.session_state.rag_pipeline.initialize_vector_store(force_rebuild=True)
                 if success:
-                    st.success("Vector store rebuilt successfully! Full transcriptions are now available.")
+                    st.success("Rebuilt!")
                     st.rerun()
-                else:
-                    st.error("Failed to rebuild vector store")
-    
+
     # Main search interface
     st.markdown('<div class="search-box">', unsafe_allow_html=True)
     
@@ -187,6 +262,7 @@ def search_interface():
         for example in example_queries:
             if st.button(f"📋 {example}", key=f"example_{example[:20]}"):
                 st.session_state.search_query = example
+                st.rerun()
     
     # Perform search
     if search_button and query:
@@ -234,22 +310,17 @@ def search_interface():
                     st.markdown("**Content:**")
                     st.write(doc['text'])
                     
-                    # Full transcription in scrollable format
-                    st.markdown("**Complete Transcription:**")
-                    
-                    # Try to get full transcription from current chunk or load from original data
+                    # Full transcription logic
                     full_text = doc.get('full_transcription', '')
-                    
                     if not full_text and hasattr(st.session_state.rag_pipeline, 'data_loader'):
                         try:
-                            # Load the original transcription
                             original_id = doc.get('original_id')
                             if original_id is not None:
                                 df = st.session_state.rag_pipeline.data_loader.load_data()
                                 if original_id < len(df):
                                     full_text = str(df.iloc[original_id]['transcription'])
                         except Exception as e:
-                            st.warning(f"Could not load full transcription: {str(e)}")
+                            pass
                     
                     if full_text:
                         st.markdown(f"""
@@ -258,21 +329,9 @@ def search_interface():
                         </div>
                         """, unsafe_allow_html=True)
                     else:
-                        st.info("Full transcription not available. Only showing chunk content above.")
+                        st.info("Full transcription not available.")
         else:
             st.error(f"Search failed: {result['response']}")
-    
-    # Search history
-    if st.session_state.search_history:
-        st.markdown("---")
-        st.markdown("### 📜 Recent Search History")
-        
-        # Show last 5 searches
-        recent_searches = st.session_state.search_history[-5:]
-        
-        for i, search in enumerate(reversed(recent_searches)):
-            status = "✅" if search['success'] else "❌"
-            st.write(f"{status} {search['query']}")
 
 def main():
     """Main application entry point"""
@@ -294,9 +353,13 @@ def main():
             # Token invalid, show login
             login_page(auth_manager)
         else:
-            # User authenticated, show main app
-            display_user_info(user_info)
-            search_interface()
+            # User authenticated, display sidebar and selected view
+            view = display_sidebar(user_info)
+            
+            if view == "💬 Chat Interface":
+                search_interface()
+            elif view == "📊 Evaluation Dashboard":
+                evaluation_dashboard()
 
 if __name__ == "__main__":
     main()

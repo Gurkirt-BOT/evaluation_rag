@@ -1,0 +1,44 @@
+
+--- Query 1: What are the symptoms of a heart attack? ---
+Base LLM Time: 1.0s
+RAG Time: 1.01s
+Base Response:
+As a medical assistant, it's crucial to be aware of the symptoms of a heart attack, also known as myocardial infarction. While some people may experience subtle symptoms, others may exhibit severe and...
+RAG Response:
+Based on the provided medical case transcripts, I can see that there are no direct mentions of heart attack symptoms or conditions. However, I can attempt to provide a general answer based on common k...
+
+--- Query 2: How is diabetes managed in elderly patients? ---
+Base LLM Time: 1.02s
+RAG Time: 0.93s
+Base Response:
+Managing diabetes in elderly patients can be complex due to a range of factors, including age-related physiological changes, comorbidities, polypharmacy, and reduced mobility. Here are some strategies...
+RAG Response:
+Based on the provided medical case transcripts, I can identify some relevant patterns and findings that may be related to diabetes management in elderly patients. However, please note that the context...
+
+--- Query 3: What treatments are available for hypertension? ---
+Base LLM Time: 0.92s
+RAG Time: 0.82s
+Base Response:
+As a medical assistant, I can provide you with a general overview of the common treatments available for hypertension. Keep in mind that it's essential to consult a healthcare professional for persona...
+RAG Response:
+Based on the provided medical case transcripts, I can identify some relevant patterns and findings that may be related to hypertension. However, please note that none of the cases explicitly mention h...
+
+--- Query 4: What are the common side effects of chemotherapy? ---
+Base LLM Time: 1.1s
+RAG Time: 10.58s
+Base Response:
+As a medical assistant, I'd be happy to guide you through the common side effects of chemotherapy. 
+
+Chemotherapy is a cancer treatment that uses medications to kill rapidly dividing cancer cells. How...
+RAG Response:
+Based on the provided medical case transcripts, I can identify some relevant patterns and findings related to chemotherapy, although the cases primarily focus on urology and do not directly mention ch...
+
+--- Query 5: What are the complications of untreated asthma? ---
+Base LLM Time: 1.88s
+RAG Time: 12.05s
+Base Response:
+Untreated asthma can lead to a range of severe complications, including:
+
+1. **Recurring Respiratory Infections**: Frequent asthma attacks can lead to weakened lung function, making it easier for bact...
+RAG Response:
+Based on the provided medical case transcripts, I must indicate that there is no direct information about asthma or its complications. The cases provided are related to Urology (testicular torsion and...
