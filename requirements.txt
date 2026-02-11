@@ -10,3 +10,4 @@ spacy
 transformers
 torch
 plotly
+en_core_web_sm
