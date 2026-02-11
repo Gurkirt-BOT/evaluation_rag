@@ -40,7 +40,7 @@ We benchmarked the Enhanced RAG against a Base LLM. Full details are in the **[E
 ## 📂 Project Structure
 
 ```text
-secure-medical-rag/
+Evaluation_Rag_Gurkirt_Kaur/
 ├── app/
 │   ├── auth.py                 # JWT authentication logic
 │   └── config.py               # Configuration settings
@@ -84,7 +84,7 @@ secure-medical-rag/
 1.  **Clone & Setup**
     ```bash
     git clone <repo-url>
-    cd secure-medical-rag
+    cd Evaluation_Rag_Gurkirt_Kaur
     python -m venv .venv
     source .venv/bin/activate  # Windows: .venv\Scripts\activate
     pip install -r requirements.txt
